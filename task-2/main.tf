@@ -7,16 +7,7 @@ resource "helm_release" "localstack" {
   version          = var.chart_version
 }
 
-resource "helm_release" "dynamodb-admin" {
-  create_namespace = var.create_namespace
-  chart            = "dynamodb"
-  name             = "dynamodb"
-  namespace        = "dynamodb"
-  repository       = "https://keyporttech.github.io/helm-charts/"
-  version          = "0.1.27"
-}
-
-resource "kubernetes_namespace" "example" {
+resource "kubernetes_namespace" "justdice" {
   metadata {
     name = "justdice"
   }
@@ -67,7 +58,7 @@ resource "kubernetes_deployment" "producer" {
           }
           env {
             name  = "CLOUD_AWS_DEFAULTS_ENDPOINT"
-            value = "localstack.justdice.svc.cluster.local"
+            value = "http://localstack.justdice.svc.cluster.local:4566"
           }
         }
       }
@@ -120,7 +111,60 @@ resource "kubernetes_deployment" "consumer" {
           }
           env {
             name  = "CLOUD_AWS_DEFAULTS_ENDPOINT"
-            value = "localstack.justdice.svc.cluster.local"
+            value = "http://localstack.justdice.svc.cluster.local:4566"
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_deployment" "dynamodb" {
+  metadata {
+    name      = "dynamodb"
+    namespace = "justdice"
+    labels = {
+      app = "dynamodb"
+    }
+  }
+
+  spec {
+    replicas = 1
+    selector {
+      match_labels = {
+        app = "dynamodb"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "dynamodb"
+        }
+      }
+      spec {
+
+        container {
+          image = "aaronshaf/dynamodb-admin"
+          name  = "dynamodb"
+
+          resources {
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
+          }
+          env {
+            name  = "DYNAMO_ENDPOINT"
+            value = "http://localstack.justdice.svc.cluster.local:4566"
+          }
+          env {
+            name  = "AWS_REGION"
+            value = "eu-central-1"
           }
         }
       }

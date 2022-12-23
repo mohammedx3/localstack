@@ -22,7 +22,7 @@ The needed infrastructure is provisioned using Terraform which are:
 - A subscription from the queue to the topicd.
 - A DynamoDb table named justdice-dev-devops-consumer-events with an Id attribute of type string as hash key.
 
-the CLOUD_AWS_DEFAULTS_ENDPOINT environment variable is defined in the producer and consumer application to be able to connect to localstack.
+the `CLOUD_AWS_DEFAULTS_ENDPOINT` environment variable is defined in the producer and consumer application to be able to connect to localstack.
 
 Usage:
 
@@ -88,5 +88,7 @@ kubectl get pods -n justdice
 
 4. You can check visual information from dynamodb-admin by doing a port-forward to it.
 ```bash
-kubectl port-forward svc/dynamodb 8001:80001 -n dynamodb
+kubectl port-forward pod/{dynamodb_pod_name} 8001:80001
 ```
+
+5. Check DynamoDB admin panel on http://localhost:8001
