@@ -1,31 +1,26 @@
 resource "aws_sns_topic" "user_updates" {
-  name = "justdice-dev-devops-producer-events"
+  name = var.topic_name
 }
 
 resource "aws_sqs_queue" "user_updates_queue" {
-  name = "justdice-dev-devops-consumer-events"
+  name = var.sqs_queue
 }
 
 resource "aws_sns_topic_subscription" "user_updates_sqs_target" {
   topic_arn = aws_sns_topic.user_updates.arn
-  protocol  = "sqs"
+  protocol  = var.protocol
   endpoint  = aws_sqs_queue.user_updates_queue.arn
 }
 
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
-  name           = "justdice-dev-devops-consumer-events"
+  name           = var.dynamodb_table
   billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
+  read_capacity  = var.read_capacity
+  write_capacity = var.write_capacity
   hash_key       = "Id"
 
   attribute {
     name = "Id"
     type = "S"
-  }
-
-  ttl {
-    attribute_name = "TimeToExist"
-    enabled        = false
   }
 }
