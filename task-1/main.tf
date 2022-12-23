@@ -1,4 +1,3 @@
-
 resource "aws_sns_topic" "user_updates" {
   name = "justdice-dev-devops-producer-events"
 }
