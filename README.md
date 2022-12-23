@@ -31,14 +31,20 @@ Usage:
 ```bash
 terraform init
 ```
-    
-2. Execute terraform
+
+2. Comment out everything in docker-compose only leaving localstack then start docker-compose with only localstack running.
 
 ```bash
-terraform apply
+docker-compose up-d
 ```
 
-3. Run docker-compose to get all apps up and running
+3. Execute terraform to create the needed infrastructure
+
+```bash
+terraform apply --var-file=dev.tfvars
+```
+
+3. Uncomment the rest of docker-compose services then run docker-compose again to get all apps up and running
 ```bash
 docker-compose up -d
 ```
@@ -47,6 +53,8 @@ docker-compose up -d
 ```bash
 docker logs -f {consumer_container_name}
 ```
+
+5. Check the dynamodb-admin GUI to see the events on http://localhost:8001/tables/justdice-dev-devops-consumer-events
 
 ### Task-2
 Running localstack on a Kubernetes cluster, using `Helm` to install localstack and dynamodb-admin.
